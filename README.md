@@ -4,6 +4,7 @@ Zero-Knowledge DAO. Also a meritocracy, TBH (meridao?).
  * Issue public ERC20 tokens via ICO (a la DAO 1.0)
  * zkDAO smart contract instantiated with link to public zkShare and funds raised during ICO
  * AZTEC note registry converts pubShares to zkShares
+ * use a stealth address scheme with ephemeral keys (a la AZTEC paper section 1.3.2)
  * Votes are based on proving you own a certain number of shares 
  * Voting is different, to account for the privacy of notes:
    * Commit period: where we commit to our voting position. This simplifies logic/security around shares being transferred and 'double-voting'.
