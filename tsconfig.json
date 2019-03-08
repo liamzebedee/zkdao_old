@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "rootDir": ".",
+        "outDir": "lib/",
+        "lib": [
+            "es2018",
+            "dom"
+        ],
+        "typeRoots": [
+          "node_modules/@types"
+        ],
+        "target": "es2018",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "module": "commonjs",
+        "inlineSourceMap": true,
+        "declaration": true,
+        "composite": true,
+        "resolveJsonModule": true
+    },
+    "include": [
+        "./build/wrappers/*",
+        "./artifacts/*.json",
+        "test"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

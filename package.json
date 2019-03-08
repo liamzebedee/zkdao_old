@@ -1,0 +1,18 @@
+{
+    "scripts": {
+        "contracts": "sol-compiler contracts/",
+        "watch:ts": "tsc -b -W tsconfig.json",
+        "test": "mocha lib/test/index.spec.js"
+    },
+    "dependencies": {
+        "sol-compiler": "^0.0.1-alpha"
+    },
+    "devDependencies": {
+        "@0x/sol-compiler": "^3.1.3",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "make-promises-safe": "^4.0.0",
+        "mocha": "^6.0.2",
+        "typescript": "^3.3.3333"
+    }
+}
