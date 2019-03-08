@@ -7,6 +7,25 @@ import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 import 'mocha';
 
+describe('ZK note registry', () => {
+    it('converts the public shares to zkshares', async () => {})
+    // it('')
+})
+
 describe('ZKDAO', () => {
-    
+    it('calculates the vote amount from a proof', async () => {
+
+    })
+
+    it(`only allows one vote per note`, async () => {
+
+    })
+
+    it(`verifies votes from only one zk token`, async () => {
+
+    })
+
+    it(``, async () => {
+
+    })
 })
