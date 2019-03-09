@@ -1,9 +1,7 @@
 pragma solidity >=0.5.0 <0.6.0;
-// pragma solidity 0.4.24;
 
 import "../AZTEC/packages/protocol/contracts/ACE/ACE.sol";
 import "../AZTEC/packages/protocol/contracts/utils/NoteUtils.sol";
-// import "./interfaces/CryptographyEngine.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract ZKDAO {
@@ -35,7 +33,7 @@ contract ZKDAO {
     mapping(uint => Proposal) proposals;
     uint numProposals;
     uint totalSupply;
-    uint DIVIDEND_PROOF_ID = 2;
+    uint16 DIVIDEND_PROOF_ID = 2;
 
     event VoteTallied(uint _prop, uint tally);
 
@@ -46,21 +44,21 @@ contract ZKDAO {
         // totalSupply = _totalSupply;
     }
 
-    function commitVote(uint _proposal, address _shareholder) public {
-        bytes32 commit = getVoteHash(_proposal, _shareholder, 0x00);
+    function commitVote(uint _proposal, address _shareholder, bytes memory _proofData) public {
+        bytes32 commit = getVoteHash(_proposal, _shareholder, _proofData);
         commits[commit] = VoteStatus.Committed;
     }
 
-    function revealVote(uint _proposal, address _shareholder, bytes memory _proof) public {
+    function revealVote(uint _proposal, address _shareholder, bytes memory _proofData) public {
         Proposal storage prop = proposals[_proposal];
         require(prop.revealPeriodStart != 0x0, "404_PROPOSAL");
         require(prop.revealPeriodStart > block.timestamp, "REVEAL_TOO_EARLY");
         require(prop.revealPeriodEnd < block.timestamp, "REVEAL_PERIOD_ENDED");
         
-        bytes32 commit = getVoteHash(_proposal, _proof);
+        bytes32 commit = getVoteHash(_proposal, _shareholder, _proofData);
         require(commits[commit] == VoteStatus.Committed, "VOTE_NOT_COMMITTED");
 
-        (bytes32 shareholder, uint votes) = validateVoteProof(_proof);
+        (address shareholder, uint votes) = validateVoteProof(_proofData);
         require(shareholder == _shareholder, "VOTE_SHAREHOLDER_MISMATCH");
 
         prop.tally += votes;
@@ -71,7 +69,7 @@ contract ZKDAO {
     function executeProposal(uint _proposal) public {
         Proposal storage prop = proposals[_proposal];
         require(prop.tally > totalSupply, "THRESHOLD_NOT_REACHED");
-        require(funds.transfer(this, prop.requestee, prop.requested), "FUNDING_TRANSFER_FAILED");
+        require(funds.transferFrom(address(this), prop.requestee, prop.requested), "FUNDING_TRANSFER_FAILED");
     }
 
     function getVoteHash(uint _proposal, address _shareholder, bytes memory _proof) public returns (bytes32) {
@@ -100,7 +98,7 @@ contract ZKDAO {
         // }
     }
 
-    function validateVoteProof(bytes memory _proofData) public returns (bytes32, uint) {        
+    function validateVoteProof(bytes memory _proofData) public returns (address, uint) {        
         bytes memory proofOutputs = ace.validateProof(DIVIDEND_PROOF_ID, msg.sender, _proofData);
         require(proofOutputs.length != 0, "proof invalid!");
         
@@ -108,9 +106,10 @@ contract ZKDAO {
         // require(ace.updateNoteRegistry(proofOutput, 1, address(this)), "could not update note registry!");
         
         (bytes memory inputNotes,
-        bytes memory outputNotes,
-        ,// address publicOwner,
-        ,/*int256 publicValue*/) = proofOutputs.get(0).extractProofOutput();
+        bytes memory outputNotes,,
+        //address publicOwner,
+        //int256 publicValue 
+        ) = proofOutputs.get(0).extractProofOutput();
 
         // notes (A, X, B)
         // inputNotes = (totalSupply)
@@ -129,13 +128,20 @@ contract ZKDAO {
         (, uint zb) = extractDividendProofParams(_proofData);
         // uint votes = zb;
         
-        return (noteHash_zkshare, zb);
+        address xx = address(this);
+        // noteHash_zkshare
+        return (xx, zb);
     }
     
 
-    function checkNoteExists(bytes memory noteHash) internal {
-        NoteRegistry.Note storage note = ace.noteRegistries(shareToken).registry(noteHash);
-        require(note.status == 1, "note nonexistent or something");
+    function checkNoteExists(bytes32 noteHash) internal {
+        // NoteRegistry.Note storage note = ace.noteRegistries(shareToken).registry(noteHash);
+        // (uint8 status,
+        // ,// bytes5 createdOn,
+        // ,// bytes5 destroyedOn,
+        // ,// address owner 
+        (uint8 status,,,) = ace.noteRegistries(shareToken).registry(noteHash);
+        require(status == 1, "note nonexistent or something");
     }
 
     
